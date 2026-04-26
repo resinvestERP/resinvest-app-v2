@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResInvest Commodities - Magazyny</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .green-gradient { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .card { background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="pb-20">
+    <!-- Header -->
+    <header class="green-gradient text-white p-6 rounded-b-3xl shadow-lg mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold">ResInvest</h1>
+                <p class="text-emerald-100 text-sm">Commodities Dashboard</p>
+            </div>
+            <div class="bg-white/20 p-3 rounded-full">
+                <i class="fas fa-chart-line text-xl"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="px-4 space-y-6">
+        <!-- KPI Section -->
+        <section class="grid grid-cols-2 gap-4" id="kpi-container">
+            <!-- KPIs will be injected here -->
+        </section>
+
+        <!-- Charts Section -->
+        <section class="card p-4">
+            <h2 class="text-lg font-semibold mb-4 text-emerald-800">Status Magazynów (MP)</h2>
+            <canvas id="warehouseChart"></canvas>
+        </section>
+
+        <!-- Transport Section -->
+        <section class="card p-4">
+            <h2 class="text-lg font-semibold mb-4 text-emerald-800">Koszty Transportu</h2>
+            <div id="transport-list" class="space-y-3">
+                <!-- Transport items will be injected here -->
+            </div>
+        </section>
+
+        <!-- Recent Transactions -->
+        <section class="card p-4 overflow-hidden">
+            <h2 class="text-lg font-semibold mb-4 text-emerald-800">Ostatnie Operacje</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="border-b text-gray-500">
+                            <th class="pb-2">Data</th>
+                            <th class="pb-2">Produkt</th>
+                            <th class="pb-2 text-right">Ilość</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactions-body">
+                        <!-- Transactions will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-4 shadow-2xl">
+        <button class="text-emerald-600 flex flex-col items-center">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-xs mt-1">Główna</span>
+        </button>
+        <button class="text-gray-400 flex flex-col items-center">
+            <i class="fas fa-warehouse text-xl"></i>
+            <span class="text-xs mt-1">Magazyny</span>
+        </button>
+        <button class="text-gray-400 flex flex-col items-center">
+            <i class="fas fa-truck text-xl"></i>
+            <span class="text-xs mt-1">Logistyka</span>
+        </button>
+    </nav>
+
+    <script>
+        const appData = {
+  "kpi": {
+    "total_volume_mp": "1055",
+    "total_value_sales": "7425",
+    "total_transport_cost": "1000",
+    "transaction_count": 5
+  },
+  "transactions": [
+    {
+      "Data załadunku do klienta końcowego": "2026-04-25T00:00:00",
+      "Data dostawy": "2026-04-25T00:00:00",
+      "Dostawca": "RiC PL Magazyn Brąszewice ",
+      "Zakup/Sprzedaż": "SPRZEDAŻ",
+      "Nr. WZ": "487/2026",
+      "Magazyn/Bez Magazynowania": "TAK",
+      "Deklaracja/KZR": "kzr",
+      "Volumen": 75,
+      "Jednostka miary": "MP",
+      "Cena zakupu/produkcji (zł/mp;zł/tona)": 0,
+      "Wartość": 7425,
+      "Cena sprzedaży (zł/mp;zł/tona)": 99,
+      "Produkt": "Zrębka produkcyjna",
+      "Rodzaj zrębki a/b": "A",
+      "Rąbanie własne/wynajęte (kto)": NaN,
+      "Koszt rąbania usługa": 0,
+      "Transport Firma": "własny (Adrian Wojciechowski)",
+      "Nr. Rejestracyjny": "SK7J434",
+      "Odległość km": 200,
+      "Koszt transportu": 1000,
+      "Odbiorca": "Veolia Łódź ",
+      "Uwagi": "Utworzył: Piotr Kurzawa",
+      "Wolumen_MP": 75,
+      "Wolumen_t": 24.75,
+      "Ruch_magazyn_MP": -75,
+      "Ruch_magazyn_t": -24.75,
+      "Wartość_zakupu_zł_calc": 0,
+      "Wartość_sprzedaży_zł_calc": 7425,
+      "Typ_transportu_heurystyka": "Własny",
+      "Koszt_rąbania_total": 0,
+      "Miesiąc_tekst": "KWIECIEŃ",
+      "Rok": 2026
+    },
+    {
+      "Data załadunku do klienta końcowego": "2026-04-25T00:00:00",
+      "Data dostawy": "2026-04-25T00:00:00",
+      "Dostawca": "RiC PL Magazyn Brąszewice ",
+      "Zakup/Sprzedaż": "PRODUKCJA",
+      "Nr. WZ": NaN,
+      "Magazyn/Bez Magazynowania": "TAK",
+      "Deklaracja/KZR": NaN,
+      "Volumen": 300,
+      "Jednostka miary": "MP",
+      "Cena zakupu/produkcji (zł/mp;zł/tona)": 0,
+      "Wartość": 0,
+      "Cena sprzedaży (zł/mp;zł/tona)": 0,
+      "Produkt": "Zrębka produkcyjna",
+      "Rodzaj zrębki a/b": NaN,
+      "Rąbanie własne/wynajęte (kto)": "własne",
+      "Koszt rąbania usługa": 10,
+      "Transport Firma": NaN,
+      "Nr. Rejestracyjny": NaN,
+      "Odległość km": 0,
+      "Koszt transportu": 0,
+      "Odbiorca": "RiC PL Magazyn Brąszewice ",
+      "Uwagi": "Utworzył: Piotr Kurzawa ",
+      "Wolumen_MP": 300,
+      "Wolumen_t": 99.0,
+      "Ruch_magazyn_MP": 300,
+      "Ruch_magazyn_t": 99.0,
+      "Wartość_zakupu_zł_calc": 0,
+      "Wartość_sprzedaży_zł_calc": 0,
+      "Typ_transportu_heurystyka": NaN,
+      "Koszt_rąbania_total": 3000,
+      "Miesiąc_tekst": "KWIECIEŃ",
+      "Rok": 2026
+    },
+    {
+      "Data załadunku do klienta końcowego": "2026-04-25T00:00:00",
+      "Data dostawy": "2026-04-25T00:00:00",
+      "Dostawca": "RiC PL Magazyn Brąszewice ",
+      "Zakup/Sprzedaż": "ZUŻYCIE",
+      "Nr. WZ": NaN,
+      "Magazyn/Bez Magazynowania": "TAK",
+      "Deklaracja/KZR": NaN,
+      "Volumen": 300,
+      "Jednostka miary": "MP",
+      "Cena zakupu/produkcji (zł/mp;zł/tona)": 0,
+      "Wartość": 0,
+      "Cena sprzedaży (zł/mp;zł/tona)": 0,
+      "Produkt": "Zrzyna",
+      "Rodzaj zrębki a/b": NaN,
+      "Rąbanie własne/wynajęte (kto)": NaN,
+      "Koszt rąbania usługa": 0,
+      "Transport Firma": NaN,
+      "Nr. Rejestracyjny": NaN,
+      "Odległość km": 0,
+      "Koszt transportu": 0,
+      "Odbiorca": "RiC PL Magazyn Brąszewice ",
+      "Uwagi": "Utworzył: Piotr Kurzawa ",
+      "Wolumen_MP": 300,
+      "Wolumen_t": 99.0,
+      "Ruch_magazyn_MP": -300,
+      "Ruch_magazyn_t": -99.0,
+      "Wartość_zakupu_zł_calc": 0,
+      "Wartość_sprzedaży_zł_calc": 0,
+      "Typ_transportu_heurystyka": NaN,
+      "Koszt_rąbania_total": 0,
+      "Miesiąc_tekst": "KWIECIEŃ",
+      "Rok": 2026
+    },
+    {
+      "Data załadunku do klienta końcowego": "2026-04-25T00:00:00",
+      "Data dostawy": "2026-04-25T00:00:00",
+      "Dostawca": "PINUS Brąszewice ",
+      "Zakup/Sprzedaż": "ZAKUP",
+      "Nr. WZ": NaN,
+      "Magazyn/Bez Magazynowania": "TAK",
+      "Deklaracja/KZR": "Deklaracja",
+      "Volumen": 300,
+      "Jednostka miary": "MP",
+      "Cena zakupu/produkcji (zł/mp;zł/tona)": 55,
+      "Wartość": 16500,
+      "Cena sprzedaży (zł/mp;zł/tona)": 0,
+      "Produkt": "Zrzyna",
+      "Rodzaj zrębki a/b": NaN,
+      "Rąbanie własne/wynajęte (kto)": NaN,
+      "Koszt rąbania usługa": 0,
+      "Transport Firma": "DAP ",
+      "Nr. Rejestracyjny": "ESI 18734",
+      "Odległość km": 0,
+      "Koszt transportu": 0,
+      "Odbiorca": "RiC PL Magazyn Brąszewice ",
+      "Uwagi": NaN,
+      "Wolumen_MP": 300,
+      "Wolumen_t": 99.0,
+      "Ruch_magazyn_MP": 300,
+      "Ruch_magazyn_t": 99.0,
+      "Wartość_zakupu_zł_calc": 16500,
+      "Wartość_sprzedaży_zł_calc": 0,
+      "Typ_transportu_heurystyka": "Zewnętrzny",
+      "Koszt_rąbania_total": 0,
+      "Miesiąc_tekst": "KWIECIEŃ",
+      "Rok": 2026
+    },
+    {
+      "Data załadunku do klienta końcowego": "2026-04-25T00:00:00",
+      "Data dostawy": "2026-04-25T00:00:00",
+      "Dostawca": "Tartak St.Kofel Zagórcze",
+      "Zakup/Sprzedaż": "ZAKUP",
+      "Nr. WZ": "293/39374",
+      "Magazyn/Bez Magazynowania": "TAK",
+      "Deklaracja/KZR": "Deklaracja ",
+      "Volumen": 80,
+      "Jednostka miary": "MP",
+      "Cena zakupu/produkcji (zł/mp;zł/tona)": 80,
+      "Wartość": 6400,
+      "Cena sprzedaży (zł/mp;zł/tona)": 0,
+      "Produkt": "Zrębka towar",
+      "Rodzaj zrębki a/b": "A",
+      "Rąbanie własne/wynajęte (kto)": NaN,
+      "Koszt rąbania usługa": 0,
+      "Transport Firma": "DAP ",
+      "Nr. Rejestracyjny": "ESI 98293",
+      "Odległość km": 0,
+      "Koszt transportu": 0,
+      "Odbiorca": "Magazyn Brąszewice ",
+      "Uwagi": "Utworzył: Piotr Kurzawa",
+      "Wolumen_MP": 80,
+      "Wolumen_t": 26.400000000000002,
+      "Ruch_magazyn_MP": 80,
+      "Ruch_magazyn_t": 26.400000000000002,
+      "Wartość_zakupu_zł_calc": 6400,
+      "Wartość_sprzedaży_zł_calc": 0,
+      "Typ_transportu_heurystyka": "Zewnętrzny",
+      "Koszt_rąbania_total": 0,
+      "Miesiąc_tekst": "KWIECIEŃ",
+      "Rok": 2026
+    }
+  ],
+  "warehouses": [],
+  "transport": [
+    {
+      "label": "Własny",
+      "kursy": 1,
+      "tony": 24.75,
+      "mp": 75,
+      "koszt": 1000
+    },
+    {
+      "label": "własny (Adrian Wojciechowski)",
+      "kursy": 1,
+      "tony": 24.75,
+      "mp": 75,
+      "koszt": 1000
+    },
+    {
+      "label": "SK7J434",
+      "kursy": 1,
+      "tony": 24.75,
+      "mp": 75,
+      "koszt": 1000
+    },
+    {
+      "label": "Zewnętrzny",
+      "kursy": 2,
+      "tony": 125.4,
+      "mp": 380,
+      "koszt": 0
+    },
+    {
+      "label": "DAP ",
+      "kursy": 2,
+      "tony": 125.4,
+      "mp": 380,
+      "koszt": 0
+    },
+    {
+      "label": "ESI 18734",
+      "kursy": 1,
+      "tony": 99,
+      "mp": 300,
+      "koszt": 0
+    },
+    {
+      "label": "ESI 98293",
+      "kursy": 1,
+      "tony": 26.400000000000002,
+      "mp": 80,
+      "koszt": 0
+    }
+  ],
+  "company": "ResInvest Commodities"
+};
+
+        // Inject KPIs
+        const kpiContainer = document.getElementById('kpi-container');
+        const kpis = [
+            { label: 'Wolumen (MP)', value: appData.kpi.total_volume_mp, icon: 'fa-box', color: 'text-emerald-600' },
+            { label: 'Sprzedaż (PLN)', value: appData.kpi.total_value_sales, icon: 'fa-coins', color: 'text-blue-600' },
+            { label: 'Transport (PLN)', value: appData.kpi.total_transport_cost, icon: 'fa-truck', color: 'text-orange-600' },
+            { label: 'Operacje', value: appData.kpi.transaction_count, icon: 'fa-sync', color: 'text-purple-600' }
+        ];
+
+        kpis.forEach(kpi => {
+            kpiContainer.innerHTML += `
+                <div class="card p-4 flex flex-col items-center justify-center text-center">
+                    <i class="fas ${kpi.icon} ${kpi.color} mb-2 text-xl"></i>
+                    <span class="text-2xl font-bold text-gray-800">${kpi.value}</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider">${kpi.label}</span>
+                </div>
+            `;
+        });
+
+        // Warehouse Chart
+        const ctx = document.getElementById('warehouseChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: appData.warehouses.map(w => w.name),
+                datasets: [{
+                    label: 'Ilość MP',
+                    data: appData.warehouses.map(w => w.mp),
+                    backgroundColor: '#10b981',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Transport List
+        const transportList = document.getElementById('transport-list');
+        appData.transport.forEach(item => {
+            if (item.koszt > 0) {
+                transportList.innerHTML += `
+                    <div class="flex justify-between items-center p-3 bg-emerald-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="bg-emerald-100 p-2 rounded-lg mr-3">
+                                <i class="fas fa-truck-moving text-emerald-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-sm text-gray-800">${item.label}</p>
+                                <p class="text-xs text-gray-500">${item.kursy} kursy | ${item.tony} t</p>
+                            </div>
+                        </div>
+                        <span class="font-bold text-emerald-700">${item.koszt} PLN</span>
+                    </div>
+                `;
+            }
+        });
+
+        // Transactions Table
+        const transBody = document.getElementById('transactions-body');
+        appData.transactions.forEach(t => {
+            const date = t['Data dostawy'] ? t['Data dostawy'].split('T')[0] : '---';
+            const typeColor = t['Zakup/Sprzedaż'] === 'SPRZEDAŻ' ? 'text-emerald-600' : 'text-blue-600';
+            transBody.innerHTML += `
+                <tr class="border-b last:border-0">
+                    <td class="py-3 text-gray-600 text-xs">${date}</td>
+                    <td class="py-3">
+                        <p class="font-medium text-gray-800">${t['Produkt']}</p>
+                        <p class="text-[10px] ${typeColor} font-bold uppercase">${t['Zakup/Sprzedaż']}</p>
+                    </td>
+                    <td class="py-3 text-right font-bold text-gray-800">${t['Volumen']} ${t['Jednostka miary']}</td>
+                </tr>
+            `;
+        });
+    </script>
+</body>
+</html>
