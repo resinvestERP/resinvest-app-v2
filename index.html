@@ -3,359 +3,459 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ResInvest Commodities - Magazyny</title>
+    <title>ResInvest Commodities - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .green-gradient { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        .card { background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            min-height: 100vh;
+        }
+
+        .gradient-header {
+            background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+            box-shadow: 0 10px 30px rgba(5, 150, 105, 0.2);
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.25rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border: 2px solid #d1fae5;
+        }
+
+        .kpi-card:hover {
+            border-color: #10b981;
+        }
+
+        .tab-button {
+            position: relative;
+            transition: all 0.3s ease;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .tab-button.active {
+            color: #059669;
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #059669, #10b981);
+            border-radius: 2px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #059669;
+            transform: scale(1.1);
+        }
+
+        .stat-badge {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .transaction-row {
+            border-bottom: 1px solid #f0fdf4;
+            transition: background-color 0.2s ease;
+        }
+
+        .transaction-row:hover {
+            background-color: #f0fdf4;
+        }
+
+        .badge-sprzedaz {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #1e40af;
+        }
+
+        .badge-produkcja {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .badge-zuzycie {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+        }
+
+        .warehouse-item {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            border-left: 4px solid #10b981;
+            transition: all 0.3s ease;
+        }
+
+        .warehouse-item:hover {
+            border-left-color: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #10b981, #34d399);
+            border-radius: 10px;
+            height: 6px;
+        }
     </style>
 </head>
-<body class="pb-20">
+<body class="pb-24">
     <!-- Header -->
-    <header class="green-gradient text-white p-6 rounded-b-3xl shadow-lg mb-6">
+    <header class="gradient-header text-white p-6 rounded-b-3xl shadow-xl mb-6 sticky top-0 z-40">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold">ResInvest</h1>
-                <p class="text-emerald-100 text-sm">Commodities Dashboard</p>
+                <h1 class="text-3xl font-bold">ResInvest</h1>
+                <p class="text-emerald-100 text-sm font-light">Commodities Management System</p>
             </div>
-            <div class="bg-white/20 p-3 rounded-full">
-                <i class="fas fa-chart-line text-xl"></i>
+            <div class="bg-white/20 backdrop-blur-md p-4 rounded-2xl hover:bg-white/30 transition">
+                <i class="fas fa-leaf text-2xl"></i>
             </div>
         </div>
     </header>
 
+    <!-- Tabs Navigation -->
+    <div class="px-4 mb-6">
+        <div class="card p-2 flex gap-2 overflow-x-auto">
+            <button class="tab-button active px-4 py-2 rounded-lg whitespace-nowrap" data-tab="dashboard">
+                <i class="fas fa-chart-line mr-2"></i>Dashboard
+            </button>
+            <button class="tab-button px-4 py-2 rounded-lg whitespace-nowrap" data-tab="warehouses">
+                <i class="fas fa-warehouse mr-2"></i>Magazyny
+            </button>
+            <button class="tab-button px-4 py-2 rounded-lg whitespace-nowrap" data-tab="transport">
+                <i class="fas fa-truck mr-2"></i>Transport
+            </button>
+            <button class="tab-button px-4 py-2 rounded-lg whitespace-nowrap" data-tab="transactions">
+                <i class="fas fa-exchange-alt mr-2"></i>Operacje
+            </button>
+        </div>
+    </div>
+
     <main class="px-4 space-y-6">
-        <!-- KPI Section -->
-        <section class="grid grid-cols-2 gap-4" id="kpi-container">
-            <!-- KPIs will be injected here -->
-        </section>
+        <!-- TAB 1: DASHBOARD -->
+        <div id="dashboard" class="tab-content active space-y-6">
+            <!-- KPI Section -->
+            <section class="grid grid-cols-2 gap-4" id="kpi-container">
+                <!-- KPIs will be injected here -->
+            </section>
 
-        <!-- Charts Section -->
-        <section class="card p-4">
-            <h2 class="text-lg font-semibold mb-4 text-emerald-800">Status Magazynów (MP)</h2>
-            <canvas id="warehouseChart"></canvas>
-        </section>
+            <!-- Charts Section -->
+            <section class="card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-emerald-900">Status Magazynów</h2>
+                    <div class="bg-emerald-50 p-2 rounded-lg">
+                        <i class="fas fa-chart-bar text-emerald-600"></i>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="warehouseChart"></canvas>
+                </div>
+            </section>
 
-        <!-- Transport Section -->
-        <section class="card p-4">
-            <h2 class="text-lg font-semibold mb-4 text-emerald-800">Koszty Transportu</h2>
-            <div id="transport-list" class="space-y-3">
-                <!-- Transport items will be injected here -->
-            </div>
-        </section>
+            <!-- Quick Stats -->
+            <section class="card p-6">
+                <h2 class="text-xl font-bold text-emerald-900 mb-4">Podsumowanie Miesiąca</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
+                        <p class="text-sm text-gray-600 mb-1">Operacji</p>
+                        <p class="text-2xl font-bold text-blue-900" id="stat-operations">0</p>
+                    </div>
+                    <div class="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
+                        <p class="text-sm text-gray-600 mb-1">Całkowity Wolumen</p>
+                        <p class="text-2xl font-bold text-purple-900" id="stat-volume">0 MP</p>
+                    </div>
+                </div>
+            </section>
+        </div>
 
-        <!-- Recent Transactions -->
-        <section class="card p-4 overflow-hidden">
-            <h2 class="text-lg font-semibold mb-4 text-emerald-800">Ostatnie Operacje</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead>
-                        <tr class="border-b text-gray-500">
-                            <th class="pb-2">Data</th>
-                            <th class="pb-2">Produkt</th>
-                            <th class="pb-2 text-right">Ilość</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transactions-body">
-                        <!-- Transactions will be injected here -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+        <!-- TAB 2: WAREHOUSES -->
+        <div id="warehouses" class="tab-content space-y-4">
+            <section class="card p-6">
+                <h2 class="text-xl font-bold text-emerald-900 mb-6">Stany Magazynów</h2>
+                <div id="warehouse-list" class="space-y-4">
+                    <!-- Warehouses will be injected here -->
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB 3: TRANSPORT -->
+        <div id="transport" class="tab-content space-y-4">
+            <section class="card p-6">
+                <h2 class="text-xl font-bold text-emerald-900 mb-6">Logistyka i Transport</h2>
+                <div id="transport-list" class="space-y-3">
+                    <!-- Transport items will be injected here -->
+                </div>
+            </section>
+
+            <!-- Transport Chart -->
+            <section class="card p-6">
+                <h2 class="text-xl font-bold text-emerald-900 mb-4">Rozkład Kosztów</h2>
+                <div class="chart-container">
+                    <canvas id="transportChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB 4: TRANSACTIONS -->
+        <div id="transactions" class="tab-content">
+            <section class="card p-6 overflow-hidden">
+                <h2 class="text-xl font-bold text-emerald-900 mb-6">Historia Operacji</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b-2 border-emerald-100">
+                                <th class="pb-3 text-emerald-900 font-semibold">Data</th>
+                                <th class="pb-3 text-emerald-900 font-semibold">Produkt</th>
+                                <th class="pb-3 text-emerald-900 font-semibold">Typ</th>
+                                <th class="pb-3 text-right text-emerald-900 font-semibold">Ilość</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-body">
+                            <!-- Transactions will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
     </main>
 
-    <!-- Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-4 shadow-2xl">
-        <button class="text-emerald-600 flex flex-col items-center">
-            <i class="fas fa-home text-xl"></i>
-            <span class="text-xs mt-1">Główna</span>
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-emerald-100 flex justify-around p-3 shadow-2xl">
+        <button class="nav-item active flex flex-col items-center py-2 px-4 rounded-lg transition" data-nav="dashboard">
+            <i class="fas fa-home text-lg"></i>
+            <span class="text-xs mt-1 font-medium">Główna</span>
         </button>
-        <button class="text-gray-400 flex flex-col items-center">
-            <i class="fas fa-warehouse text-xl"></i>
-            <span class="text-xs mt-1">Magazyny</span>
+        <button class="nav-item flex flex-col items-center py-2 px-4 rounded-lg transition" data-nav="warehouses">
+            <i class="fas fa-warehouse text-lg"></i>
+            <span class="text-xs mt-1 font-medium">Magazyny</span>
         </button>
-        <button class="text-gray-400 flex flex-col items-center">
-            <i class="fas fa-truck text-xl"></i>
-            <span class="text-xs mt-1">Logistyka</span>
+        <button class="nav-item flex flex-col items-center py-2 px-4 rounded-lg transition" data-nav="transport">
+            <i class="fas fa-truck text-lg"></i>
+            <span class="text-xs mt-1 font-medium">Transport</span>
+        </button>
+        <button class="nav-item flex flex-col items-center py-2 px-4 rounded-lg transition" data-nav="transactions">
+            <i class="fas fa-list text-lg"></i>
+            <span class="text-xs mt-1 font-medium">Operacje</span>
         </button>
     </nav>
 
     <script>
-        const appData = {
-  "kpi": {
-    "total_volume_mp": "1055",
-    "total_value_sales": "7425",
-    "total_transport_cost": "1000",
-    "transaction_count": 5
-  },
-  "transactions": [
-    {
-      "Data załadunku do klienta końcowego": "2026-04-25T00:00:00",
-      "Data dostawy": "2026-04-25T00:00:00",
-      "Dostawca": "RiC PL Magazyn Brąszewice ",
-      "Zakup/Sprzedaż": "SPRZEDAŻ",
-      "Nr. WZ": "487/2026",
-      "Magazyn/Bez Magazynowania": "TAK",
-      "Deklaracja/KZR": "kzr",
-      "Volumen": 75,
-      "Jednostka miary": "MP",
-      "Cena zakupu/produkcji (zł/mp;zł/tona)": 0,
-      "Wartość": 7425,
-      "Cena sprzedaży (zł/mp;zł/tona)": 99,
-      "Produkt": "Zrębka produkcyjna",
-      "Rodzaj zrębki a/b": "A",
-      "Rąbanie własne/wynajęte (kto)": NaN,
-      "Koszt rąbania usługa": 0,
-      "Transport Firma": "własny (Adrian Wojciechowski)",
-      "Nr. Rejestracyjny": "SK7J434",
-      "Odległość km": 200,
-      "Koszt transportu": 1000,
-      "Odbiorca": "Veolia Łódź ",
-      "Uwagi": "Utworzył: Piotr Kurzawa",
-      "Wolumen_MP": 75,
-      "Wolumen_t": 24.75,
-      "Ruch_magazyn_MP": -75,
-      "Ruch_magazyn_t": -24.75,
-      "Wartość_zakupu_zł_calc": 0,
-      "Wartość_sprzedaży_zł_calc": 7425,
-      "Typ_transportu_heurystyka": "Własny",
-      "Koszt_rąbania_total": 0,
-      "Miesiąc_tekst": "KWIECIEŃ",
-      "Rok": 2026
-    },
-    {
-      "Data załadunku do klienta końcowego": "2026-04-25T00:00:00",
-      "Data dostawy": "2026-04-25T00:00:00",
-      "Dostawca": "RiC PL Magazyn Brąszewice ",
-      "Zakup/Sprzedaż": "PRODUKCJA",
-      "Nr. WZ": NaN,
-      "Magazyn/Bez Magazynowania": "TAK",
-      "Deklaracja/KZR": NaN,
-      "Volumen": 300,
-      "Jednostka miary": "MP",
-      "Cena zakupu/produkcji (zł/mp;zł/tona)": 0,
-      "Wartość": 0,
-      "Cena sprzedaży (zł/mp;zł/tona)": 0,
-      "Produkt": "Zrębka produkcyjna",
-      "Rodzaj zrębki a/b": NaN,
-      "Rąbanie własne/wynajęte (kto)": "własne",
-      "Koszt rąbania usługa": 10,
-      "Transport Firma": NaN,
-      "Nr. Rejestracyjny": NaN,
-      "Odległość km": 0,
-      "Koszt transportu": 0,
-      "Odbiorca": "RiC PL Magazyn Brąszewice ",
-      "Uwagi": "Utworzył: Piotr Kurzawa ",
-      "Wolumen_MP": 300,
-      "Wolumen_t": 99.0,
-      "Ruch_magazyn_MP": 300,
-      "Ruch_magazyn_t": 99.0,
-      "Wartość_zakupu_zł_calc": 0,
-      "Wartość_sprzedaży_zł_calc": 0,
-      "Typ_transportu_heurystyka": NaN,
-      "Koszt_rąbania_total": 3000,
-      "Miesiąc_tekst": "KWIECIEŃ",
-      "Rok": 2026
-    },
-    {
-      "Data załadunku do klienta końcowego": "2026-04-25T00:00:00",
-      "Data dostawy": "2026-04-25T00:00:00",
-      "Dostawca": "RiC PL Magazyn Brąszewice ",
-      "Zakup/Sprzedaż": "ZUŻYCIE",
-      "Nr. WZ": NaN,
-      "Magazyn/Bez Magazynowania": "TAK",
-      "Deklaracja/KZR": NaN,
-      "Volumen": 300,
-      "Jednostka miary": "MP",
-      "Cena zakupu/produkcji (zł/mp;zł/tona)": 0,
-      "Wartość": 0,
-      "Cena sprzedaży (zł/mp;zł/tona)": 0,
-      "Produkt": "Zrzyna",
-      "Rodzaj zrębki a/b": NaN,
-      "Rąbanie własne/wynajęte (kto)": NaN,
-      "Koszt rąbania usługa": 0,
-      "Transport Firma": NaN,
-      "Nr. Rejestracyjny": NaN,
-      "Odległość km": 0,
-      "Koszt transportu": 0,
-      "Odbiorca": "RiC PL Magazyn Brąszewice ",
-      "Uwagi": "Utworzył: Piotr Kurzawa ",
-      "Wolumen_MP": 300,
-      "Wolumen_t": 99.0,
-      "Ruch_magazyn_MP": -300,
-      "Ruch_magazyn_t": -99.0,
-      "Wartość_zakupu_zł_calc": 0,
-      "Wartość_sprzedaży_zł_calc": 0,
-      "Typ_transportu_heurystyka": NaN,
-      "Koszt_rąbania_total": 0,
-      "Miesiąc_tekst": "KWIECIEŃ",
-      "Rok": 2026
-    },
-    {
-      "Data załadunku do klienta końcowego": "2026-04-25T00:00:00",
-      "Data dostawy": "2026-04-25T00:00:00",
-      "Dostawca": "PINUS Brąszewice ",
-      "Zakup/Sprzedaż": "ZAKUP",
-      "Nr. WZ": NaN,
-      "Magazyn/Bez Magazynowania": "TAK",
-      "Deklaracja/KZR": "Deklaracja",
-      "Volumen": 300,
-      "Jednostka miary": "MP",
-      "Cena zakupu/produkcji (zł/mp;zł/tona)": 55,
-      "Wartość": 16500,
-      "Cena sprzedaży (zł/mp;zł/tona)": 0,
-      "Produkt": "Zrzyna",
-      "Rodzaj zrębki a/b": NaN,
-      "Rąbanie własne/wynajęte (kto)": NaN,
-      "Koszt rąbania usługa": 0,
-      "Transport Firma": "DAP ",
-      "Nr. Rejestracyjny": "ESI 18734",
-      "Odległość km": 0,
-      "Koszt transportu": 0,
-      "Odbiorca": "RiC PL Magazyn Brąszewice ",
-      "Uwagi": NaN,
-      "Wolumen_MP": 300,
-      "Wolumen_t": 99.0,
-      "Ruch_magazyn_MP": 300,
-      "Ruch_magazyn_t": 99.0,
-      "Wartość_zakupu_zł_calc": 16500,
-      "Wartość_sprzedaży_zł_calc": 0,
-      "Typ_transportu_heurystyka": "Zewnętrzny",
-      "Koszt_rąbania_total": 0,
-      "Miesiąc_tekst": "KWIECIEŃ",
-      "Rok": 2026
-    },
-    {
-      "Data załadunku do klienta końcowego": "2026-04-25T00:00:00",
-      "Data dostawy": "2026-04-25T00:00:00",
-      "Dostawca": "Tartak St.Kofel Zagórcze",
-      "Zakup/Sprzedaż": "ZAKUP",
-      "Nr. WZ": "293/39374",
-      "Magazyn/Bez Magazynowania": "TAK",
-      "Deklaracja/KZR": "Deklaracja ",
-      "Volumen": 80,
-      "Jednostka miary": "MP",
-      "Cena zakupu/produkcji (zł/mp;zł/tona)": 80,
-      "Wartość": 6400,
-      "Cena sprzedaży (zł/mp;zł/tona)": 0,
-      "Produkt": "Zrębka towar",
-      "Rodzaj zrębki a/b": "A",
-      "Rąbanie własne/wynajęte (kto)": NaN,
-      "Koszt rąbania usługa": 0,
-      "Transport Firma": "DAP ",
-      "Nr. Rejestracyjny": "ESI 98293",
-      "Odległość km": 0,
-      "Koszt transportu": 0,
-      "Odbiorca": "Magazyn Brąszewice ",
-      "Uwagi": "Utworzył: Piotr Kurzawa",
-      "Wolumen_MP": 80,
-      "Wolumen_t": 26.400000000000002,
-      "Ruch_magazyn_MP": 80,
-      "Ruch_magazyn_t": 26.400000000000002,
-      "Wartość_zakupu_zł_calc": 6400,
-      "Wartość_sprzedaży_zł_calc": 0,
-      "Typ_transportu_heurystyka": "Zewnętrzny",
-      "Koszt_rąbania_total": 0,
-      "Miesiąc_tekst": "KWIECIEŃ",
-      "Rok": 2026
-    }
-  ],
-  "warehouses": [],
-  "transport": [
-    {
-      "label": "Własny",
-      "kursy": 1,
-      "tony": 24.75,
-      "mp": 75,
-      "koszt": 1000
-    },
-    {
-      "label": "własny (Adrian Wojciechowski)",
-      "kursy": 1,
-      "tony": 24.75,
-      "mp": 75,
-      "koszt": 1000
-    },
-    {
-      "label": "SK7J434",
-      "kursy": 1,
-      "tony": 24.75,
-      "mp": 75,
-      "koszt": 1000
-    },
-    {
-      "label": "Zewnętrzny",
-      "kursy": 2,
-      "tony": 125.4,
-      "mp": 380,
-      "koszt": 0
-    },
-    {
-      "label": "DAP ",
-      "kursy": 2,
-      "tony": 125.4,
-      "mp": 380,
-      "koszt": 0
-    },
-    {
-      "label": "ESI 18734",
-      "kursy": 1,
-      "tony": 99,
-      "mp": 300,
-      "koszt": 0
-    },
-    {
-      "label": "ESI 98293",
-      "kursy": 1,
-      "tony": 26.400000000000002,
-      "mp": 80,
-      "koszt": 0
-    }
-  ],
-  "company": "ResInvest Commodities"
-};
+        const appData = {DATA_PLACEHOLDER};
+        let warehouseChart = null;
+        let transportChart = null;
+
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // Reinitialize charts if needed
+            if (tabName === 'transport' && transportChart === null) {
+                initTransportChart();
+            }
+        }
+
+        // Tab button listeners
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                switchTab(this.dataset.tab);
+            });
+        });
+
+        // Bottom navigation listeners
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                switchTab(this.dataset.nav);
+            });
+        });
 
         // Inject KPIs
         const kpiContainer = document.getElementById('kpi-container');
         const kpis = [
-            { label: 'Wolumen (MP)', value: appData.kpi.total_volume_mp, icon: 'fa-box', color: 'text-emerald-600' },
-            { label: 'Sprzedaż (PLN)', value: appData.kpi.total_value_sales, icon: 'fa-coins', color: 'text-blue-600' },
-            { label: 'Transport (PLN)', value: appData.kpi.total_transport_cost, icon: 'fa-truck', color: 'text-orange-600' },
-            { label: 'Operacje', value: appData.kpi.transaction_count, icon: 'fa-sync', color: 'text-purple-600' }
+            { label: 'Wolumen (MP)', value: appData.kpi.total_volume_mp, icon: 'fa-box', color: 'from-emerald-50 to-emerald-100', textColor: 'text-emerald-900' },
+            { label: 'Sprzedaż (PLN)', value: appData.kpi.total_value_sales, icon: 'fa-coins', color: 'from-blue-50 to-blue-100', textColor: 'text-blue-900' },
+            { label: 'Transport (PLN)', value: appData.kpi.total_transport_cost, icon: 'fa-truck', color: 'from-orange-50 to-orange-100', textColor: 'text-orange-900' },
+            { label: 'Operacje', value: appData.kpi.transaction_count, icon: 'fa-sync', color: 'from-purple-50 to-purple-100', textColor: 'text-purple-900' }
         ];
 
         kpis.forEach(kpi => {
             kpiContainer.innerHTML += `
-                <div class="card p-4 flex flex-col items-center justify-center text-center">
-                    <i class="fas ${kpi.icon} ${kpi.color} mb-2 text-xl"></i>
-                    <span class="text-2xl font-bold text-gray-800">${kpi.value}</span>
-                    <span class="text-xs text-gray-500 uppercase tracking-wider">${kpi.label}</span>
+                <div class="kpi-card p-5 rounded-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="bg-gradient-to-br ${kpi.color} p-3 rounded-lg">
+                            <i class="fas ${kpi.icon} ${kpi.textColor} text-lg"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">+12%</span>
+                    </div>
+                    <p class="text-2xl font-bold ${kpi.textColor}">${kpi.value}</p>
+                    <p class="text-xs text-gray-500 mt-1 uppercase tracking-wide">${kpi.label}</p>
                 </div>
             `;
         });
 
+        // Update stats
+        document.getElementById('stat-operations').textContent = appData.kpi.transaction_count;
+        document.getElementById('stat-volume').textContent = appData.kpi.total_volume_mp + ' MP';
+
         // Warehouse Chart
         const ctx = document.getElementById('warehouseChart').getContext('2d');
-        new Chart(ctx, {
+        warehouseChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: appData.warehouses.map(w => w.name),
+                labels: appData.warehouses.map(w => w.name.trim()),
                 datasets: [{
                     label: 'Ilość MP',
                     data: appData.warehouses.map(w => w.mp),
-                    backgroundColor: '#10b981',
-                    borderRadius: 8
+                    backgroundColor: [
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(5, 150, 105, 0.8)',
+                        'rgba(52, 211, 153, 0.8)',
+                        'rgba(167, 243, 208, 0.8)'
+                    ],
+                    borderColor: '#059669',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    hoverBackgroundColor: '#059669'
                 }]
             },
             options: {
                 responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true } }
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(5, 150, 105, 0.1)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
             }
+        });
+
+        // Transport Chart
+        function initTransportChart() {
+            const transportCtx = document.getElementById('transportChart');
+            if (!transportCtx) return;
+            
+            const ctx = transportCtx.getContext('2d');
+            transportChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: appData.transport.filter(t => t.koszt > 0).map(t => t.label),
+                    datasets: [{
+                        data: appData.transport.filter(t => t.koszt > 0).map(t => t.koszt),
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(249, 115, 22, 0.8)',
+                            'rgba(168, 85, 247, 0.8)'
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 15, font: { size: 12 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Warehouse List
+        const warehouseList = document.getElementById('warehouse-list');
+        appData.warehouses.forEach((warehouse, index) => {
+            const maxVolume = Math.max(...appData.warehouses.map(w => w.mp));
+            const percentage = (warehouse.mp / maxVolume) * 100;
+            
+            warehouseList.innerHTML += `
+                <div class="warehouse-item p-4 rounded-xl">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">${warehouse.name.trim()}</h3>
+                            <p class="text-xs text-gray-500 mt-1">${warehouse.tony} ton | ${warehouse.wartosc} PLN</p>
+                        </div>
+                        <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-semibold">${warehouse.mp} MP</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="progress-bar" style="width: ${percentage}%"></div>
+                    </div>
+                </div>
+            `;
         });
 
         // Transport List
@@ -363,17 +463,19 @@
         appData.transport.forEach(item => {
             if (item.koszt > 0) {
                 transportList.innerHTML += `
-                    <div class="flex justify-between items-center p-3 bg-emerald-50 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="bg-emerald-100 p-2 rounded-lg mr-3">
-                                <i class="fas fa-truck-moving text-emerald-600"></i>
+                    <div class="card p-4 flex justify-between items-center hover:shadow-lg">
+                        <div class="flex items-center flex-1">
+                            <div class="bg-gradient-to-br from-emerald-100 to-emerald-50 p-3 rounded-lg mr-4">
+                                <i class="fas fa-truck-moving text-emerald-600 text-lg"></i>
                             </div>
                             <div>
-                                <p class="font-semibold text-sm text-gray-800">${item.label}</p>
-                                <p class="text-xs text-gray-500">${item.kursy} kursy | ${item.tony} t</p>
+                                <p class="font-semibold text-gray-800">${item.label}</p>
+                                <p class="text-xs text-gray-500">${item.kursy} kursy | ${item.tony} ton | ${item.mp} MP</p>
                             </div>
                         </div>
-                        <span class="font-bold text-emerald-700">${item.koszt} PLN</span>
+                        <div class="text-right">
+                            <p class="font-bold text-emerald-700 text-lg">${item.koszt} PLN</p>
+                        </div>
                     </div>
                 `;
             }
@@ -383,15 +485,20 @@
         const transBody = document.getElementById('transactions-body');
         appData.transactions.forEach(t => {
             const date = t['Data dostawy'] ? t['Data dostawy'].split('T')[0] : '---';
-            const typeColor = t['Zakup/Sprzedaż'] === 'SPRZEDAŻ' ? 'text-emerald-600' : 'text-blue-600';
+            let badgeClass = 'badge-sprzedaz';
+            if (t['Zakup/Sprzedaż'] === 'PRODUKCJA') badgeClass = 'badge-produkcja';
+            if (t['Zakup/Sprzedaż'] === 'ZUŻYCIE') badgeClass = 'badge-zuzycie';
+            
             transBody.innerHTML += `
-                <tr class="border-b last:border-0">
-                    <td class="py-3 text-gray-600 text-xs">${date}</td>
-                    <td class="py-3">
+                <tr class="transaction-row hover:bg-emerald-50">
+                    <td class="py-4 text-gray-600 text-xs font-medium">${date}</td>
+                    <td class="py-4">
                         <p class="font-medium text-gray-800">${t['Produkt']}</p>
-                        <p class="text-[10px] ${typeColor} font-bold uppercase">${t['Zakup/Sprzedaż']}</p>
                     </td>
-                    <td class="py-3 text-right font-bold text-gray-800">${t['Volumen']} ${t['Jednostka miary']}</td>
+                    <td class="py-4">
+                        <span class="${badgeClass} text-xs font-bold px-2 py-1 rounded-full">${t['Zakup/Sprzedaż']}</span>
+                    </td>
+                    <td class="py-4 text-right font-bold text-gray-800">${t['Volumen']} ${t['Jednostka miary']}</td>
                 </tr>
             `;
         });
